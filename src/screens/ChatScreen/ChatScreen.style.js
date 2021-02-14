@@ -88,6 +88,11 @@ const styles = (theme) => ({
   backdrop: {
     backgroundColor: theme['back-drop-color'],
   },
+  addAttchmentButton: {
+    paddingHorizontal: 0,
+    backgroundColor: 'transparent',
+    justifyContent: 'flex-end',
+  },
 });
 
 export default styles;

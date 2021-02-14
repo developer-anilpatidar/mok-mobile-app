@@ -284,7 +284,16 @@ export const sendMessage = ({ conversationId, message }) => async (dispatch) => 
   try {
     const apiUrl = `conversations/${conversationId}/messages`;
 
-    const response = await axios.post(apiUrl, message);
+    var form = new FormData();
+    form.append('content', message.content);
+    form.append('private', message.private);
+    if (message.attachments) {
+      for (var i = 0; i < message.attachments.length; i++) {
+        form.append('attachments[]', message.attachments[i]);
+      }
+    }
+
+    const response = await axios.post(apiUrl, form);
 
     dispatch({
       type: SEND_MESSAGE_SUCCESS,

@@ -12,6 +12,7 @@ import {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { ActionSheetCustom as ActionSheet } from 'react-native-actionsheet';
+import DocumentPicker from 'react-native-document-picker';
 
 import {
   View,
@@ -57,6 +58,10 @@ const BackAction = (props) => <TopNavigationAction {...props} icon={BackIcon} />
 
 const PaperPlaneIconFill = (style) => {
   return <Icon {...style} name="paper-plane" />;
+};
+
+const PaperClipIconFill = (style) => {
+  return <Icon {...style} name="attach-2-outline" />;
 };
 
 const renderAnchor = () => <View />;
@@ -438,6 +443,41 @@ class ChatScreenComponent extends Component {
     this.props.toggleTypingStatus({ conversationId, typingStatus: 'on' });
   };
 
+  addAttchment = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [
+          DocumentPicker.types.images,
+          DocumentPicker.types.plainText,
+          DocumentPicker.types.audio,
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.video,
+        ],
+      });
+
+      const { route } = this.props;
+      const {
+        params: { conversationId },
+      } = route;
+      res.content_type = res.type;
+
+      this.props.sendMessage({
+        conversationId,
+        message: {
+          content: '',
+          private: false,
+          attachments: [res],
+        },
+      });
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err;
+      }
+    }
+  };
+
   render() {
     const {
       allMessages,
@@ -525,6 +565,13 @@ class ChatScreenComponent extends Component {
                 ))}
               </OverflowMenu>
             )}
+            <Button
+              style={style.addAttchmentButton}
+              appearance="ghost"
+              size="large"
+              accessoryLeft={PaperClipIconFill}
+              onPress={this.addAttchment}
+            />
             <Button
               style={style.addMessageButton}
               appearance="ghost"
